@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SururuCoin: consulta de saldo</title>
+  <meta name="description"
+    content="Consulta do saldo de SururuCoin (SURU) de qualquer endereço, lendo o contrato ERC-20 com ethers.js.">
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111318'/%3E%3Cpath d='M9 21.5C9 15 14.5 9.5 22.5 8.6c1.3-.1 2.2.9 1.9 2.2-1.5 7.2-7.6 12.8-13.4 13.2-1.4.1-2-1-2-2.5z' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="lateral">
+      <div class="marca">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8" fill="#111318" />
+          <path d="M9 21.5C9 15 14.5 9.5 22.5 8.6c1.3-.1 2.2.9 1.9 2.2-1.5 7.2-7.6 12.8-13.4 13.2-1.4.1-2-1-2-2.5z"
+            fill="#fff" />
+        </svg>
+        SururuCoin
+      </div>
+
+      <nav class="navegacao" aria-label="Seções">
+        <a class="navegacao__item navegacao__item--ativo" href="#" aria-current="page">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="2" y="3.5" width="12" height="9.5" rx="2" />
+            <path d="M2 6.5h12M10.5 9.8h1" />
+          </svg>
+          Consulta de saldo
+        </a>
+        <p class="navegacao__grupo">Referências</p>
+        <a class="navegacao__item" href="https://sepolia.etherscan.io/token/0x974dbB87b937FC8Ba2f5aA79a3051A12a9bc19b3"
+          target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="7" cy="7" r="4.5" />
+            <path d="m10.4 10.4 3.1 3.1" />
+          </svg>
+          Contrato no Etherscan
+          <svg class="externo" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3.5h6.5V10M12.5 3.5 4 12" />
+          </svg>
+        </a>
+        <a class="navegacao__item" href="https://eips.ethereum.org/EIPS/eip-20" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M4 2h5.5L12 4.5V14H4z" />
+            <path d="M9.5 2v2.5H12M6 8h4M6 10.5h4" />
+          </svg>
+          Padrão ERC-20
+          <svg class="externo" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3.5h6.5V10M12.5 3.5 4 12" />
+          </svg>
+        </a>
+        <a class="navegacao__item" href="https://www.alchemy.com/faucets/ethereum-sepolia" target="_blank"
+          rel="noopener">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M8 2.2c2.4 3 3.8 5.1 3.8 7a3.8 3.8 0 0 1-7.6 0c0-1.9 1.4-4 3.8-7z" />
+          </svg>
+          Faucet Sepolia
+          <svg class="externo" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3.5h6.5V10M12.5 3.5 4 12" />
+          </svg>
+        </a>
+      </nav>
+
+      <p class="lateral__rodape">Atividade prática Minha Criptomoeda<br>Tópicos Especiais em SI · IFAL</p>
+    </aside>
+
+    <header class="topo">
+      <div class="trilha">
+        <span>SururuCoin</span>
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+          stroke-linecap="round">
+          <path d="m6 3.5 4.5 4.5L6 12.5" />
+        </svg>
+        <strong>Consulta de saldo</strong>
+      </div>
+      <div class="rede">
+        <select id="modo" aria-label="Ler a blockchain por">
+          <option value="metamask">MetaMask, na rede escolhida na carteira</option>
+          <option value="local">Nó local do Hardhat (127.0.0.1:8545)</option>
+          <option value="sepolia">Sepolia por RPC público, sem carteira</option>
+        </select>
+        <button type="button" id="botao-conectar" class="botao botao--neutro">Conectar</button>
+      </div>
+    </header>
+
+    <main class="principal">
+      <div class="pagina">
+        <div class="cabecalho">
+          <div>
+            <h1>Consulta de saldo</h1>
+            <p id="status" class="status" role="status">Nenhuma conexão ainda.</p>
+          </div>
+          <span class="selo">ERC-20 · SURU</span>
+        </div>
+
+        <div class="grade">
+          <section class="cartao" aria-labelledby="titulo-consulta">
+            <div class="cartao__topo">
+              <h2 class="cartao__titulo" id="titulo-consulta">Parâmetros</h2>
+              <span class="cartao__nota">balanceOf(address)</span>
+            </div>
+            <form id="formulario" class="cartao__corpo" novalidate>
+              <div class="campo">
+                <label for="contrato">Endereço do contrato</label>
+                <input id="contrato" class="entrada hex" name="contrato" placeholder="0x…" autocomplete="off"
+                  spellcheck="false">
+                <p id="dica-contrato" class="dica"></p>
+              </div>
+
+              <div class="campo">
+                <div class="rotulo-linha">
+                  <label for="endereco">Endereço a consultar</label>
+                  <button type="button" id="botao-minha-conta" class="botao-texto">Usar minha conta</button>
+                </div>
+                <input id="endereco" class="entrada hex" name="endereco" placeholder="0x…" autocomplete="off"
+                  spellcheck="false">
+              </div>
+
+              <div class="acoes">
+                <p class="cartao__nota">Leitura via chamada view: sem transação e sem gas.</p>
+                <button type="submit" id="botao-consultar" class="botao botao--primario">Consultar saldo</button>
+              </div>
+
+              <p id="erro" class="erro" role="alert" hidden></p>
+            </form>
+          </section>
+
+          <div class="coluna">
+            <div class="cartao vazio">
+              <span class="vazio__icone">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3.5" width="12" height="9.5" rx="2" />
+                  <path d="M2 6.5h12M10.5 9.8h1" />
+                </svg>
+              </span>
+              <strong>Nenhuma consulta ainda</strong>
+              <p>Conecte a uma rede, informe o contrato e o endereço, e o saldo aparece aqui.</p>
+            </div>
+
+            <section id="resultado" class="cartao" aria-live="polite" hidden>
+              <div class="cartao__topo">
+                <h2 class="cartao__titulo">Saldo</h2>
+                <p class="aovivo" id="res-aovivo" hidden>Ao vivo</p>
+              </div>
+              <div class="cartao__corpo">
+                <p class="resultado__endereco" id="res-endereco"></p>
+                <p class="saldo" id="res-saldo-bloco"><span id="res-saldo"></span> <span class="simbolo"
+                    id="res-simbolo"></span></p>
+                <div class="indicadores">
+                  <span id="res-participacao"></span>
+                  <a id="res-link" class="link" href="#" target="_blank" rel="noopener" hidden>
+                    Ver no Etherscan
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 3.5h6.5V10M12.5 3.5 4 12" />
+                    </svg>
+                  </a>
+                </div>
+                <p id="res-unidades"></p>
+              </div>
+            </section>
+
+            <section id="token" class="cartao" aria-labelledby="titulo-token" hidden>
+              <div class="cartao__topo">
+                <h2 class="cartao__titulo" id="titulo-token">Token</h2>
+                <button type="button" id="botao-metamask" class="botao botao--neutro" hidden>Adicionar à
+                  MetaMask</button>
+              </div>
+              <dl class="dados">
+                <div>
+                  <dt>Nome</dt>
+                  <dd id="tk-nome"></dd>
+                </div>
+                <div>
+                  <dt>Símbolo</dt>
+                  <dd id="tk-simbolo"></dd>
+                </div>
+                <div>
+                  <dt>Casas decimais</dt>
+                  <dd id="tk-casas"></dd>
+                </div>
+                <div>
+                  <dt>Fornecimento total</dt>
+                  <dd id="tk-total"></dd>
+                </div>
+                <div>
+                  <dt>Rede</dt>
+                  <dd id="tk-rede"></dd>
+                </div>
+                <div>
+                  <dt>Padrão</dt>
+                  <dd>ERC-20</dd>
+                </div>
+                <div class="largo">
+                  <dt>Contrato</dt>
+                  <dd id="tk-contrato" class="hex"></dd>
+                </div>
+              </dl>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.17.0/dist/ethers.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
