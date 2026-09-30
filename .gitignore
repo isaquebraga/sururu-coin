@@ -1,0 +1,13 @@
+/node_modules
+/dist
+/bundle
+/artifacts
+/cache
+/types
+.env
+.env.*
+!.env.example
+/coverage
+/.gas-snapshot
+/snapshots
+/.claude
